@@ -72,9 +72,9 @@ A Fase 03 possui persistência de vídeos/sessões/outbox, integração S3/MinIO
 Redis/BullMQ direto (sem `@nestjs/bullmq`), upload multipart, rotas de controle,
 worker FFmpeg e delivery privado. SI-03.1–27 preservam o histórico e
 SI-03.28–37 registram a remediação corrente em
-`docs/phases/phase-03-videos/progress.md`. A primeira passagem corrente dos
-gates executou 316 testes padrão, 92 e2e, 14 integrações FFmpeg e 2 e2e de
-worker; a certificação do candidato congelado continua sendo um gate separado.
+`docs/phases/phase-03-videos/progress.md`. O candidato integrado certificado
+localmente executou 316 testes padrão, 92 e2e, 14 integrações FFmpeg e 2 e2e de
+worker; somente a publicação remota continua sendo um gate separado.
 Os dois ensaios grandes correntes com probe independente cumpriram os critérios
 de conteúdo, delivery, recursos e latência; use apenas a seção corrente de
 evidências para aceitar a remediação. Preserve os registros datados em

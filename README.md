@@ -52,10 +52,10 @@ O projeto é um monorepo baseado em containers Docker. Cada subprojeto sobe sua 
 - **Message Queue** (Redis/BullMQ direto) — transporte idempotente; a outbox no
   PostgreSQL é a intenção durável de processamento e recuperação de vídeos.
 
-A Fase 03 está implementada nesta branch. Regressões, a primeira passagem dos
-gates e os dois ensaios grandes correntes passaram; a certificação sobre o
-candidato congelado e a integração Git Flow permanecem separadas. Evidências e
-estado estão em
+A Fase 03 está implementada, integrada e certificada localmente nesta branch.
+Regressões, gates e os dois ensaios grandes correntes passaram; somente a
+publicação remota via Git Flow permanece condicionada a autorização separada.
+Evidências e estado estão em
 [`docs/phases/phase-03-videos/progress.md`](docs/phases/phase-03-videos/progress.md).
 
 O diagrama de arquitetura completo (C4) está em `docs/diagrams/software-arch.mermaid`.

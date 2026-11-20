@@ -108,6 +108,16 @@ API/worker, MinIO, scratch e event loop está publicado em
 [`large-trials.md`](large-trials.md); tentativas reprovadas ou interrompidas
 foram preservadas sem substituir os resultados aprovados.
 
-A certificação final de SI-03.36 permanece separada: secret scan, manifesto do
-candidato congelado, repetição dos quatro gates e verificação byte a byte ainda
-devem ocorrer sobre a mesma árvore.
+## Certificação local do candidato integrado — 20/11/2026
+
+`upstream/dev` foi atualizado para `0b82246f` e confirmado como ancestral da
+feature, sem necessidade de rebase ou merge. A autorização da tarefa 9.2 gerou
+os commits focados `2f467af` (fundação Codex), `ff42437` (pipeline da Fase 03) e
+`cbc401b` (documentação/evidências), sem alterar `main`.
+
+Após os commits, a primeira repetição passou 316 testes padrão, 92 e2e, 14
+integrações FFmpeg, 2 e2e de worker, TypeScript e lint. A repetição final ocorreu
+entre os manifests determinísticos before/after adjacentes, que registram a
+mesma árvore byte a byte. A varredura de segredos não encontrou material
+privado no candidato. Push e publicação não estão autorizados pela tarefa 9.2 e
+permanecem pendentes da autorização distinta da tarefa 9.3.

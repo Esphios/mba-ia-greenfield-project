@@ -2,7 +2,7 @@
 kind: phase
 name: phase-03-videos
 ui_in_scope: false
-review_status: audit-2026-11-18-remediation-in-progress
+review_status: audit-2026-11-18-local-candidate-certified
 sources_mtime:
   docs/project-plan.md: "2026-11-06T21:14:04.524112+00:00"
   docs/decisions/technical-decisions-phase-03-videos.md: "2026-11-17T23:44:23.9433401Z"
@@ -364,16 +364,16 @@ a DoD runtime ainda depende dos gates finais sobre manifesto estável.
 
 O estado corrente substitui apenas a interpretação de aceite, sem apagar o
 histórico. SI-03.1–15 são a base, SI-03.16–27 registram trabalho observado em
-17/11, SI-03.28–35 estão concluídas, SI-03.36 certifica o candidato e SI-03.37
-permanece condicionada a autorizações posteriores. A auditoria F01–F12/N01–N12
+17/11, SI-03.28–36 estão concluídas e SI-03.37 foi integrada localmente, com a
+publicação condicionada a autorização posterior. A auditoria F01–F12/N01–N12
 reabriu cleanup/quota, fencing multipart, relógio/CAS/TTL, JSON/OpenAPI, deadlines
 S3, readiness/portabilidade/policy/logs, perfil de mídia, ensaios e certificação.
 
 A execução autorizada usa `compose.test.yaml` standalone e comandos
 no container. `clean` continua significando somente coerência do planejamento;
 não significa aprovação, implementação, teste, ensaio, DoD, commit ou publicação.
-SI-03.37 depende do candidato aprovado de SI-03.36 e mantém autorizações distintas
-para mutações Git e para push/verificação pública.
+SI-03.37 recebeu autorização para commits e reconciliação local após o candidato
+aprovado de SI-03.36; push e verificação pública mantêm autorização distinta.
 
 ## Inherited Decisions Detail
 
@@ -439,6 +439,6 @@ Prever fixtures de MP4 pequeno válido/corrompido, interrupção/retomada, colis
 Range 206/416, falhas/crashes, duplicidade de job e reentrega após lease vencida.
 Ensaios separados comprovam fronteira 10GB e mídia representativa, com métricas
 por etapa até terminal e refresh JWT. Regras/fixtures estão consolidadas em TD-09.
-Os snapshots de 08/11 registram execuções anteriores. A primeira passagem
-corrente e os dois novos ensaios grandes passaram; a remediação ainda exige
-testes, e2e, tsc e lint sobre o candidato corrigido e congelado.
+Os snapshots de 08/11 registram execuções anteriores. Os dois novos ensaios
+grandes e a repetição de testes, e2e, tsc e lint sobre o candidato integrado e
+congelado passaram; os manifests adjacentes registram a identidade da árvore.

@@ -10,10 +10,10 @@ qualquer formato. O worker aceita MP4 com exatamente uma faixa principal H.264
 3840×2160. Assim, vídeo portrait com altura acima de 2160 é rejeitado mesmo se
 a largura estiver dentro de 3840.
 
-Na remediação corrente, regressões, primeira passagem dos gates e os ensaios de
-fronteira e mídia representativa passaram. A repetição da DoD sobre o candidato
-congelado permanece um gate separado; consulte `progress.md` antes de declarar
-o aceite integral.
+Na remediação corrente, regressões, gates e os ensaios de fronteira e mídia
+representativa passaram. A DoD foi repetida sobre o candidato integrado e
+congelado; somente a publicação remota permanece separada. Consulte
+`progress.md` para o estado de entrega.
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>

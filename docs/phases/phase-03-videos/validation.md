@@ -3,7 +3,7 @@ kind: phase
 name: phase-03-videos
 status: clean
 issue_count: 0
-review_status: audit-2026-11-18-remediation-in-progress
+review_status: audit-2026-11-18-local-candidate-certified
 sources_mtime:
   docs/phases/phase-03-videos/context.md: "2026-11-18T05:13:18.9605951Z"
   docs/decisions/technical-decisions-phase-03-videos.md: "2026-11-17T23:44:23.9433401Z"
@@ -296,23 +296,21 @@ commit, integração ou publicação.
 - SI-03.1–15: base histórica.
 - SI-03.16–27: remediação histórica executada em 17/11/2026, com os mesmos títulos
   e significados em plano e progresso.
-- SI-03.28–35: trabalho corrente concluído com regressões, primeira passagem dos
-  gates e dois ensaios grandes observados; os artefatos públicos preservam
-  tentativas reprovadas/interrompidas e os resultados aprovados.
-- SI-03.36: certificação corrente pendente de manifesto e gates sobre a mesma
-  árvore congelada.
-- SI-03.37 depende de SI-03.36 aprovado e de autorizações posteriores distintas
-  para commit/integração e push/publicação.
+- SI-03.28–36: trabalho corrente concluído com regressões, gates, dois ensaios
+  grandes e certificação sobre a mesma árvore congelada; os artefatos públicos
+  preservam tentativas reprovadas/interrompidas e os resultados aprovados.
+- SI-03.37 recebeu autorização para commit e reconciliação local; a publicação
+  remota continua dependente de autorização distinta.
 
 | Requisitos | Unidades correntes | Evidência pública observada / pendência |
 | --- | --- | --- |
-| F01–F04 | SI-03.28, SI-03.34, SI-03.36–37 | [stack e primeira passagem](evidence/remediation-2026-11-18.md); manifests/gates congelados e Git permanecem pendentes |
+| F01–F04 | SI-03.28, SI-03.34, SI-03.36–37 | [stack e certificação local](evidence/remediation-2026-11-18.md); manifests e gates congelados concluídos, publicação remota pendente |
 | F05–F06 | SI-03.29 | [52 testes dirigidos + 3 e2e](evidence/remediation-2026-11-18.md) em PostgreSQL/MinIO reais |
 | F07–F09 | SI-03.30 | [matriz corrente](evidence/failpoint-matrix.md) de corrida, relógio DB, CAS e TTL |
 | F10–F11 | SI-03.31 | [regressões F08–F12](evidence/remediation-2026-11-18.md), documento OpenAPI e tipos regenerados |
 | F12 | SI-03.32 | [deadline/cancelamento](evidence/remediation-2026-11-18.md) e recovery de resultado ambíguo |
 | N01–N04/N12 | SI-03.33–35 | [dois ensaios correntes](evidence/large-trials.md) medidos por atividade e operação portátil |
-| N05–N11 | SI-03.31, SI-03.33, SI-03.36 | [policy/logs/Compose](evidence/remediation-2026-11-18.md) e [mídia representativa](evidence/large-trials.md); candidato público ainda pendente |
+| N05–N11 | SI-03.31, SI-03.33, SI-03.36 | [policy/logs/Compose e candidato local](evidence/remediation-2026-11-18.md) e [mídia representativa](evidence/large-trials.md); publicação pública ainda pendente |
 
 Validação estrutural de 18/11: títulos SI-03.16–27 coincidem entre plano e
 progresso; SI-03.28–37 têm identidade única; o mapa termina em SI-03.36 antes de

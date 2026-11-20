@@ -32,7 +32,7 @@ Range 206/416, thumbnail, tamanhos e hashes sobre storage privado. Evidências
 estão em `docs/phases/phase-03-videos/evidence/large-trials.md`; a primeira
 passagem integral e suas contagens estão em
 `docs/phases/phase-03-videos/evidence/remediation-2026-11-18.md`. A certificação
-do candidato congelado continua separada.
+local do candidato integrado e congelado repetiu os gates, com publicação pendente.
 
 ## Test Scenarios
 

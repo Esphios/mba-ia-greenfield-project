@@ -1,8 +1,8 @@
 # phase-03-videos — Progress
 
-**Status:** remediation_in_progress
+**Status:** local_candidate_certified_publication_pending
 **SIs:** SI-03.1–15 base; SI-03.16–27 históricos; SI-03.28–37 remediação atual
-**Implementation:** SI-03.28–35 implementados e verificados; SI-03.36 em execução; SI-03.37 condicionada
+**Implementation:** SI-03.28–36 concluídos; SI-03.37 integrada localmente, publicação pendente
 
 ## Baseline da auditoria de requisitos — 2026-11-18
 
@@ -60,12 +60,13 @@
   verificados. A probe independente ficou abaixo de 500 ms, de 2× o baseline e
   sem erros em todas as janelas de atividade. Tentativas reprovadas ou
   interrompidas continuam preservadas e não foram reclassificadas.
-- **SI-03.36:** documentação e lista pública estão em reconciliação; secret
-  scan, manifesto determinístico e repetição dos gates sobre o candidato
-  congelado ainda são necessários para o aceite.
-- **SI-03.37:** somente a preparação documental está em escopo. Commit,
-  integração e push continuam proibidos até autorizações explícitas e separadas
-  das tarefas 9.2 e 9.3.
+- **SI-03.36:** candidato integrado certificado localmente. Secret scan e
+  manifests determinísticos before/after cobrem a mesma árvore; passaram 316
+  testes padrão, 92 e2e, 14 integrações FFmpeg, 2 e2e de worker, tsc e lint.
+- **SI-03.37:** a autorização da tarefa 9.2 permitiu três commits focados e a
+  reconciliação com `upstream/dev`, já ancestral da feature. `main` permaneceu
+  intocada. Push e publicação continuam proibidos até a autorização distinta da
+  tarefa 9.3.
 
 ## Snapshot histórico — remediação da auditoria de 2026-11-16
 

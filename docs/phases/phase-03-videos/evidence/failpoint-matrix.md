@@ -41,5 +41,5 @@ gates e dois grandes ensaios do candidato atual, sem reutilizar o aceite antigo.
 
 Os comandos, topologia e limites estão detalhados em
 `remediation-2026-11-18.md`. A13/A14 foram reavaliados pelos dois ensaios
-correntes de SI-03.35 e pelos artefatos de `large-trials.md`; a certificação do
-candidato congelado de SI-03.36 continua pendente.
+correntes de SI-03.35 e pelos artefatos de `large-trials.md`; a certificação
+local do candidato congelado de SI-03.36 foi concluída, com publicação pendente.

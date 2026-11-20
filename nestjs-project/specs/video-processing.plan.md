@@ -34,8 +34,8 @@ A primeira passagem integral executou 316 testes padrão, 92 e2e, 14 integraçõ
 FFmpeg e 2 e2e de worker. Os dois ensaios grandes correntes chegaram a `ready` e
 publicaram recursos, disco e event loop. Evidências estão em
 `docs/phases/phase-03-videos/evidence/remediation-2026-11-18.md` e
-`docs/phases/phase-03-videos/evidence/large-trials.md`; a certificação do
-candidato congelado continua separada.
+`docs/phases/phase-03-videos/evidence/large-trials.md`; a certificação local do
+candidato integrado e congelado repetiu os mesmos gates, com publicação pendente.
 
 ## Test Scenarios
 

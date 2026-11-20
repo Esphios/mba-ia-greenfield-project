@@ -42,8 +42,8 @@ reexercitados no Compose standalone. A primeira passagem integral executou
 316 testes padrão e 92 e2e; os ensaios de fronteira e mídia representativa
 validaram expiração natural, refresh rotation e retomada. Contagens e limitações
 estão em `docs/phases/phase-03-videos/evidence/remediation-2026-11-18.md` e
-`docs/phases/phase-03-videos/evidence/large-trials.md`; a certificação do
-candidato congelado continua separada.
+`docs/phases/phase-03-videos/evidence/large-trials.md`; a certificação local do
+candidato integrado e congelado repetiu os mesmos gates, com publicação pendente.
 
 ## Test Scenarios
 
