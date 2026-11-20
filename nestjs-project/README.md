@@ -1,3 +1,20 @@
+O backend do StreamTube inclui upload multipart, processamento de vídeo em
+worker separado e entrega privada por URLs assinadas. Consulte o
+[runbook de vídeos](../docs/phases/phase-03-videos/runbook.md) para inicialização,
+capacidade, retenção e recuperação. O estado de aceite da Fase 03 está em
+[progress.md](../docs/phases/phase-03-videos/progress.md).
+
+O limite de 10.000.000.000 bytes é de transporte, não uma promessa de aceitar
+qualquer formato. O worker aceita MP4 com exatamente uma faixa principal H.264
+`yuv420p`, zero ou uma faixa AAC e largura/altura limitadas respectivamente a
+3840×2160. Assim, vídeo portrait com altura acima de 2160 é rejeitado mesmo se
+a largura estiver dentro de 3840.
+
+Na remediação corrente, regressões, primeira passagem dos gates e os ensaios de
+fronteira e mídia representativa passaram. A repetição da DoD sobre o candidato
+congelado permanece um gate separado; consulte `progress.md` antes de declarar
+o aceite integral.
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
@@ -25,37 +42,58 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+## Ambiente containerizado
 
 ```bash
-$ npm install
+docker compose up -d
+docker compose ps
 ```
 
-## Compile and run the project
+O job `dependencies` executa `npm ci` usando o lockfile e preenche o volume
+nomeado compartilhado pela API, migrations e inicialização do storage. Não é
+necessário ter `node_modules` no host. A ordem é `dependencies` →
+`migrations`/`storage-init` → `nestjs-api`/`video-worker`; uma segunda subida é
+idempotente. O worker usa BullMQ diretamente, e PostgreSQL/outbox mantém a
+intenção durável. Confirme `healthy` para MinIO e worker; `Up` isoladamente não
+é evidência de prontidão.
 
-```bash
-# development
-$ npm run start
+Rotas da fase: `POST /videos`, `GET /videos/:publicId`, controle em
+`/videos/:publicId/upload`, e delivery privado em `stream`, `download` e
+`thumbnail`. A canonical URL deriva de `API_PUBLIC_URL`; URLs assinadas usam o
+`S3_PUBLIC_ENDPOINT` alcançável pelo cliente.
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
+O Compose de desenvolvimento já inicia `start:dev`; não abra uma segunda
+instância dentro do mesmo container.
 
 ## Run tests
 
 ```bash
 # unit tests
-$ npm run test
+docker compose exec nestjs-api npm test -- --runInBand
 
 # e2e tests
-$ npm run test:e2e
+docker compose exec nestjs-api npm run test:e2e -- --runInBand
 
 # test coverage
-$ npm run test:cov
+docker compose exec nestjs-api npm run test:cov -- --runInBand
 ```
+
+Para DB/Redis/MinIO descartáveis, `compose.test.yaml` é standalone. A primeira
+subida instala dependências, inicializa storage e executa migrations antes da
+API; `--profile worker` habilita o consumidor real:
+
+```bash
+docker compose -f compose.test.yaml --profile worker up -d --build
+docker compose -f compose.test.yaml exec -T nestjs-api-test npm test -- --runInBand
+docker compose -f compose.test.yaml exec -T nestjs-api-test npm run test:e2e -- --runInBand
+docker compose -f compose.test.yaml exec -T nestjs-api-test npx tsc --noEmit
+docker compose -f compose.test.yaml exec -T nestjs-api-test npm run lint -- --no-fix
+docker compose -f compose.test.yaml --profile worker exec -T -e VIDEO_WORKER_INTEGRATION=1 video-worker-test npm test -- --runInBand
+docker compose -f compose.test.yaml exec -T -e VIDEO_WORKER_E2E=1 nestjs-api-test npm run test:e2e -- --runInBand
+docker compose -f compose.test.yaml --profile worker down -v --remove-orphans
+```
+
+Consulte o [runbook](../docs/phases/phase-03-videos/runbook.md).
 
 ## Deployment
 

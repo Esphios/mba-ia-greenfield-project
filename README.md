@@ -18,14 +18,14 @@ Este é um projeto greenfield desenvolvido para demonstrar como construir uma ap
 
 ## Quadro Branco
 
-- [Quadro Branco](./whiteboard.png)
+- [Quadro Branco](./whiteboard.svg)
 
 ---
 
 ## 🎨 Design System (Figma)
 
 - [FC Tube.fig](./FC%20Tube.fig) — arquivo-fonte do **design system** do projeto no Figma.
-- [FC Tube sem padrão.fig](./FC%20Tube%20sem%20padrao.fig) — arquivo-fonte puro, sem tokens, cores, tipografia e espaçamento.
+- [FC Tube sem padrão.fig](./FC%20Tube%20sem%20padr%C3%A3o.fig) — arquivo-fonte puro, sem tokens, cores, tipografia e espaçamento.
 
 Contém os fundamentos visuais do StreamTube — tokens (cores, tipografia, espaçamento, raios), componentes e as telas da plataforma. É a referência de design para a implementação do frontend: os componentes em `next-frontend/components/ui` (shadcn) e os tokens em `next-frontend/app/globals.css` derivam deste arquivo. Abra-o no Figma (`Arquivo → Importar`) para consultar especificações e estados visuais.
 
@@ -43,11 +43,20 @@ O projeto é um monorepo baseado em containers Docker. Cada subprojeto sobe sua 
 
 - **Frontend** (Next.js 16, App Router + React Server Components) — interface da plataforma. Segue o **modelo BFF**: o navegador nunca chama a API NestJS diretamente; todo tráfego passa por Route Handlers same-origin em `app/api/**`, que fazem proxy server-side para a API.
 - **API** (NestJS 11) — regras de negócio, autenticação (JWT + refresh token rotation), envio de e-mails e acesso ao banco.
-- **Database** (PostgreSQL 17) — usuários, canais e tokens de autenticação.
+- **Database** (PostgreSQL 17) — usuários, canais, autenticação e estados de vídeo/upload.
 - **Email Service** (Mailpit) — captura os e-mails transacionais (confirmação de conta e recuperação de senha) em uma UI local.
-- **Video Worker** (FFmpeg) — processamento de vídeos *(planejado — Fase 03)*.
-- **Object Storage** (S3/MinIO) — arquivos de vídeo e thumbnails *(planejado — Fase 03)*.
-- **Message Queue** — fila de processamento de vídeos *(planejado — Fase 03)*.
+- **Video Worker** (FFmpeg) — aceita somente MP4 com um vídeo H.264 `yuv420p`,
+  zero ou uma faixa AAC e eixos de até 3840×2160; remuxa para faststart e gera
+  thumbnail JPEG. Portrait com altura acima de 2160 é rejeitado.
+- **Object Storage** (S3/MinIO) — originais, derivados privados e URLs temporárias.
+- **Message Queue** (Redis/BullMQ direto) — transporte idempotente; a outbox no
+  PostgreSQL é a intenção durável de processamento e recuperação de vídeos.
+
+A Fase 03 está implementada nesta branch. Regressões, a primeira passagem dos
+gates e os dois ensaios grandes correntes passaram; a certificação sobre o
+candidato congelado e a integração Git Flow permanecem separadas. Evidências e
+estado estão em
+[`docs/phases/phase-03-videos/progress.md`](docs/phases/phase-03-videos/progress.md).
 
 O diagrama de arquitetura completo (C4) está em `docs/diagrams/software-arch.mermaid`.
 
@@ -60,18 +69,16 @@ Os dois subprojetos têm stacks Docker **separadas**. Suba primeiro o backend, r
 ```bash
 cd nestjs-project
 
-# Sobe API, banco e Mailpit
+# Instala dependências em volume, executa migrations/storage-init e sobe a API
 docker compose up -d
 
-# Instala dependências (apenas na primeira vez)
-docker compose exec nestjs-api npm install
-
-# Cria o schema do banco (obrigatório — synchronize está desabilitado)
-docker compose exec nestjs-api npm run migration:run
-
-# Sobe o servidor de desenvolvimento em watch mode
-docker compose exec -d nestjs-api npm run start:dev
+# Confere jobs e serviços; não requer node_modules no host
+docker compose ps
 ```
+
+MinIO e `video-worker` precisam aparecer como `healthy`; `Up` sozinho não prova
+prontidão. Operação, capacidade e stack isolada estão no
+[runbook da Fase 03](docs/phases/phase-03-videos/runbook.md).
 
 Serviços disponíveis:
 
@@ -105,12 +112,29 @@ A aplicação ficará disponível em **http://localhost:3001**.
 
 ```bash
 cd nestjs-project
-docker compose exec nestjs-api npm test               # unitários + integração
-docker compose exec nestjs-api npm run test:e2e       # end-to-end (HTTP via supertest)
-docker compose exec nestjs-api npm run test:cov       # cobertura
+docker compose exec nestjs-api npm test -- --runInBand
+docker compose exec nestjs-api npm run test:e2e -- --runInBand
+docker compose exec nestjs-api npm run test:cov -- --runInBand
 ```
 
 Sufixos: `*.spec.ts` (unitário), `*.integration-spec.ts` (integração com banco real), `*.e2e-spec.ts` (end-to-end). Testes de integração/e2e rodam com `--runInBand`.
+
+Para a certificação isolada da Fase 03, use somente o Compose standalone:
+
+```bash
+cd nestjs-project
+docker compose -f compose.test.yaml --profile worker up -d --build
+docker compose -f compose.test.yaml exec -T nestjs-api-test npm test -- --runInBand
+docker compose -f compose.test.yaml exec -T nestjs-api-test npm run test:e2e -- --runInBand
+docker compose -f compose.test.yaml exec -T nestjs-api-test npx tsc --noEmit
+docker compose -f compose.test.yaml exec -T nestjs-api-test npm run lint -- --no-fix
+docker compose -f compose.test.yaml --profile worker exec -T -e VIDEO_WORKER_INTEGRATION=1 video-worker-test npm test -- --runInBand
+docker compose -f compose.test.yaml exec -T -e VIDEO_WORKER_E2E=1 nestjs-api-test npm run test:e2e -- --runInBand
+docker compose -f compose.test.yaml --profile worker down -v --remove-orphans
+```
+
+`migrations-test` roda na primeira subida; não combine `compose.test.yaml` com a
+stack de desenvolvimento.
 
 ### Frontend (Vitest + Playwright)
 

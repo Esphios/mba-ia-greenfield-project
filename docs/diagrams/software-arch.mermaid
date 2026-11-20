@@ -7,10 +7,10 @@ C4Container
     Container_Boundary(c1, "StreamTube") {
         Container(frontend, "Frontend", "Next.js", "Platform interface")
         Container(api, "API", "Nest.js", "Business rules and authentication")
-        Container(worker, "Video Worker", "FFmpeg", "Processes videos in background")
+        Container(worker, "Video Worker", "NestJS + FFmpeg", "Dispatches outbox, reconciles state and processes videos")
         ContainerDb(db, "Database", "PostgreSQL", "Users, channels, videos, comments, likes")
         ContainerDb(storage, "Object Storage", "S3 or MinIO", "Video files and thumbnails")
-        ContainerQueue(queue, "Message Queue", "TBD", "Enqueues video processing jobs")
+        ContainerQueue(queue, "Message Queue", "Redis 7.4 + BullMQ 5", "Idempotent delivery; PostgreSQL outbox is durable intent")
     }
 
     System_Ext(email, "Email Service", "Account confirmation and password recovery")
@@ -21,11 +21,11 @@ C4Container
     Rel(frontend, storage, "Streams", "HTTPS")
 
     Rel(api, db, "Reads/Writes")
-    Rel(api, storage, "Uploads")
-    Rel(api, queue, "Publishes job")
+    Rel(api, storage, "Signs direct multipart upload")
     Rel(api, email, "Sends email", "SMTP")
 
     Rel(queue, worker, "Delivers job")
+    Rel(worker, queue, "Publishes outbox jobs")
     Rel(worker, storage, "Reads/Saves")
     Rel(worker, db, "Updates")
 
