@@ -1,2 +1,6 @@
 .history/
 settings.local.json
+docs/desafio/
+openspec/
+# Gerado por scripts/sync-codex-foundation.ps1; a fonte pública é docs/ai/codex/.
+.agents/

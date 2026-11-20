@@ -1,0 +1,15 @@
+# Configuração de projeto: nenhuma credencial pessoal.
+# Requer confiança no projeto e nova leitura pelo cliente Codex.
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+
+# Equivalente do exemplo PostgreSQL original, restrito ao ambiente local.
+# Desativado até haver infraestrutura; a sessão atual usa ferramentas existentes.
+[mcp_servers.postgres]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-postgres", "postgresql://streamtube:streamtube@localhost:5432/streamtube"]
+enabled = false
+
+[mcp_servers.figma]
+url = "http://127.0.0.1:3845/mcp"
+enabled = false

@@ -1,0 +1,2 @@
+# Preserve Markdown formatting in the ported AI foundation source.
+docs/ai/codex/** whitespace=-trailing-space
