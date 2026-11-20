@@ -1,36 +1,190 @@
+name: streamtube
+
+x-app-environment: &app-environment
+  NODE_ENV: development
+  DB_HOST: db
+  DB_PORT: "5432"
+  DB_USERNAME: streamtube
+  DB_PASSWORD: streamtube
+  DB_NAME: streamtube
+  DB_DATABASE: streamtube
+  JWT_SECRET: local-access-secret-with-at-least-32-characters
+  JWT_REFRESH_SECRET: local-refresh-secret-with-at-least-32-characters
+  JWT_ACCESS_EXPIRATION: 15m
+  JWT_REFRESH_EXPIRATION: 7d
+  CONFIRMATION_TOKEN_EXPIRATION_HOURS: "1"
+  PASSWORD_RESET_TOKEN_EXPIRATION_HOURS: "1"
+  MAIL_HOST: mailpit
+  MAIL_PORT: "1025"
+  MAIL_FROM: "StreamTube <noreply@streamtube.local>"
+  API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:${API_PORT:-3000}}
+  S3_BACKEND: minio
+  S3_INTERNAL_ENDPOINT: http://minio:9000
+  S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:9000}
+  S3_REGION: us-east-1
+  S3_BUCKET: streamtube-videos
+  S3_ACCESS_KEY_ID: streamtube-minio
+  S3_SECRET_ACCESS_KEY: streamtube-minio-secret
+  S3_FORCE_PATH_STYLE: "true"
+  S3_ALLOWED_ORIGINS: http://localhost:3000
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  VIDEO_QUEUE_PREFIX: streamtube
+
+x-app-service: &app-service
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  working_dir: /home/node/app
+  volumes:
+    - .:/home/node/app
+    - app-node-modules:/home/node/app/node_modules
+  environment: *app-environment
+
 services:
-  nestjs-api:
-    build: 
+  dependencies:
+    build:
       context: .
       dockerfile: Dockerfile.dev
-    ports:
-      - 3000:3000
+    working_dir: /home/node/app
+    command: ["npm", "ci"]
+    user: "0:0"
     volumes:
       - .:/home/node/app
+      - app-node-modules:/home/node/app/node_modules
+    restart: "no"
+
+  nestjs-api:
+    <<: *app-service
+    command: ["npm", "run", "start:dev"]
+    ports:
+      - "${API_PORT:-3000}:3000"
     depends_on:
-      db:
+      migrations:
+        condition: service_completed_successfully
+      storage-init:
+        condition: service_completed_successfully
+      redis:
         condition: service_healthy
       mailpit:
         condition: service_started
 
+  video-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.video-worker
+    environment: *app-environment
+    volumes:
+      - worker-scratch:/work/videos
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+      storage-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    stop_grace_period: 2m
+    healthcheck:
+      test: ["CMD", "node", "-e", "const fs=require('fs');const p='/tmp/video-worker-ready';const s=fs.statSync(p);process.exit(Date.now()-s.mtimeMs<30000?0:1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+
+  migrations:
+    <<: *app-service
+    command: ["npm", "run", "migration:run"]
+    restart: "no"
+    depends_on:
+      dependencies:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+
+  storage-init:
+    <<: *app-service
+    command: ["npm", "run", "storage:init"]
+    restart: "no"
+    depends_on:
+      dependencies:
+        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
+
   db:
     image: postgres:17
     ports:
-      - "5432:5432"
+      - "${DB_PORT_HOST:-5432}:5432"
     environment:
-      - POSTGRES_USER=streamtube
-      - POSTGRES_PASSWORD=streamtube
-      - POSTGRES_DB=streamtube
+      POSTGRES_USER: streamtube
+      POSTGRES_PASSWORD: streamtube
+      POSTGRES_DB: streamtube
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U streamtube"]
+      test: ["CMD-SHELL", "pg_isready -U streamtube -d streamtube"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 5s
+
+  redis:
+    image: redis:7.4.7-bookworm@sha256:976ab0f0939b78c06d802bcd3bea44c5142ea9a756a57b861e08819817f768c8
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "${REDIS_PORT_HOST:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  minio:
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    image: streamtube/minio:RELEASE.2025-10-15T17-29-55Z
+    environment:
+      MINIO_ROOT_USER: streamtube-minio
+      MINIO_ROOT_PASSWORD: streamtube-minio-secret
+      MINIO_API_CORS_ALLOW_ORIGIN: http://localhost:3000
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
   mailpit:
-    image: axllent/mailpit
+    image: axllent/mailpit:v1.27.7
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "${MAIL_SMTP_PORT:-1025}:1025"
+      - "${MAIL_UI_PORT:-8025}:8025"
 
-
+volumes:
+  app-node-modules:
+  postgres-data:
+  redis-data:
+  minio-data:
+  worker-scratch:

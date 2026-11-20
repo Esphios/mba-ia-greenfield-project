@@ -200,6 +200,139 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/videos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an idempotent video upload draft */
+        post: operations["VideosController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/videos/{publicId}/upload/parts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["VideosController_signParts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/videos/{publicId}/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["VideosController_uploadState"];
+        put?: never;
+        post?: never;
+        delete: operations["VideosController_abort"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/videos/{publicId}/upload/completion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["VideosController_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/videos/{publicId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the canonical owner-only video view */
+        get: operations["VideosController_getVideo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/videos/{publicId}/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect owner to a temporary stream URL */
+        get: operations["VideosController_stream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head: operations["VideosController_headStream"];
+        patch?: never;
+        trace?: never;
+    };
+    "/videos/{publicId}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect owner to a temporary original download URL */
+        get: operations["VideosController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head: operations["VideosController_headDownload"];
+        patch?: never;
+        trace?: never;
+    };
+    "/videos/{publicId}/thumbnail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect owner to a temporary JPEG thumbnail URL */
+        get: operations["VideosController_thumbnail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head: operations["VideosController_headThumbnail"];
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -210,6 +343,69 @@ export interface components {
         RefreshTokenDto: Record<string, never>;
         ForgotPasswordDto: Record<string, never>;
         ResetPasswordDto: Record<string, never>;
+        CreateVideoDto: {
+            title: string;
+            filename: string;
+            sizeBytes: number;
+            /** @enum {string} */
+            contentType: "video/mp4";
+        };
+        VideoViewDto: {
+            /** Format: uuid */
+            id: string;
+            publicId: string;
+            title: string;
+            /** @enum {string} */
+            status: "draft" | "processing" | "ready" | "error";
+            sizeBytes: number;
+            durationMs: Record<string, never> | null;
+            metadata: Record<string, never> | null;
+            failureCode: Record<string, never> | null;
+            canonicalUrl: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UploadedPartDto: {
+            partNumber: number;
+            sizeBytes: number;
+            etag: string;
+        };
+        VideoUploadStateDto: {
+            /** @enum {string} */
+            state: "initiating" | "uploading" | "completing" | "completed" | "aborted" | "expired";
+            partSize: number;
+            partCount: number;
+            /** Format: date-time */
+            expiresAt: string;
+            lastErrorCode: Record<string, never> | null;
+            uploadedParts: components["schemas"]["UploadedPartDto"][];
+        };
+        CreateVideoResponseDto: {
+            video: components["schemas"]["VideoViewDto"];
+            upload: components["schemas"]["VideoUploadStateDto"];
+        };
+        SignPartsDto: {
+            partNumbers: number[];
+        };
+        SignedPartDto: {
+            partNumber: number;
+            /** Format: uri */
+            url: string;
+            expectedSizeBytes: number;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        SignPartsResponseDto: {
+            parts: components["schemas"]["SignedPartDto"][];
+        };
+        CompleteUploadDto: Record<string, never>;
+        CompleteUploadResponseDto: {
+            publicId: string;
+            /** @enum {string} */
+            status: "processing" | "ready" | "error";
+        };
         ApiErrorEnvelope: {
             /** @example 401 */
             statusCode: number;
@@ -587,6 +783,545 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiErrorEnvelope"];
                 };
+            };
+        };
+    };
+    VideosController_create: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateVideoDto"];
+            };
+        };
+        responses: {
+            /** @description Idempotent replay */
+            200: {
+                headers: {
+                    Location?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateVideoResponseDto"];
+                };
+            };
+            /** @description Upload draft created */
+            201: {
+                headers: {
+                    Location?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateVideoResponseDto"];
+                };
+            };
+            /** @description VALIDATION_ERROR */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CHANNEL_REQUIRED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description IDEMPOTENCY_CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_TOO_LARGE/BODY_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UNSUPPORTED_MEDIA_TYPE */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UPLOAD_QUOTA_EXCEEDED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Storage or identifier unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_signParts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignPartsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignPartsResponseDto"];
+                };
+            };
+            /** @description VALIDATION_ERROR */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UPLOAD_STATE_CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UPLOAD_EXPIRED */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description STORAGE_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_uploadState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoUploadStateDto"];
+                };
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description STORAGE_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_abort: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Upload aborted or already terminal */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UPLOAD_STATE_CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description STORAGE_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_complete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CompleteUploadDto"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompleteUploadResponseDto"];
+                };
+            };
+            /** @description VALIDATION_ERROR/UPLOAD_INCOMPLETE */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UPLOAD_STATE_CONFLICT */
+            409: {
+                headers: {
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UPLOAD_EXPIRED */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description UPLOAD_SIZE_MISMATCH */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description STORAGE_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_getVideo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoViewDto"];
+                };
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_stream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Temporary private MP4 URL; Range handled by storage */
+            307: {
+                headers: {
+                    Location?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_READY */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_headStream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Temporary private MP4 URL */
+            307: {
+                headers: {
+                    Location?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_READY */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private original with attachment disposition */
+            307: {
+                headers: {
+                    Location?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_READY */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_headDownload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Temporary private download URL */
+            307: {
+                headers: {
+                    Location?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_READY */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_thumbnail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private JPEG thumbnail */
+            307: {
+                headers: {
+                    Location?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_READY */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VideosController_headThumbnail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                publicId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Temporary private thumbnail URL */
+            307: {
+                headers: {
+                    Location?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VIDEO_NOT_READY */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

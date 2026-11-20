@@ -1,0 +1,191 @@
+name: streamtube-phase03-test
+
+services:
+  dependencies-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: ["npm", "ci"]
+    working_dir: /home/node/app
+    user: "0:0"
+    volumes:
+      - .:/home/node/app
+      - test-node-modules:/home/node/app/node_modules
+    restart: "no"
+
+  nestjs-api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: ["sh", "-c", "tail -f /dev/null"]
+    working_dir: /home/node/app
+    volumes:
+      - .:/home/node/app
+      - test-node-modules:/home/node/app/node_modules
+    environment: &test-app-environment
+      NODE_ENV: test
+      DB_HOST: db-test
+      DB_PORT: "5432"
+      DB_USERNAME: streamtube_phase03_test
+      DB_PASSWORD: streamtube_phase03_test
+      DB_NAME: streamtube_phase03_test
+      DB_DATABASE: streamtube_phase03_test
+      JWT_SECRET: test-access-secret-with-at-least-32-characters
+      JWT_REFRESH_SECRET: test-refresh-secret-with-at-least-32-characters
+      JWT_ACCESS_EXPIRATION: 15m
+      JWT_REFRESH_EXPIRATION: 7d
+      CONFIRMATION_TOKEN_EXPIRATION_HOURS: "1"
+      PASSWORD_RESET_TOKEN_EXPIRATION_HOURS: "1"
+      MAIL_HOST: mailpit-test
+      MAIL_PORT: "1025"
+      MAIL_FROM: noreply@streamtube.test
+      S3_BACKEND: minio
+      S3_INTERNAL_ENDPOINT: http://minio-test:9000
+      S3_PUBLIC_ENDPOINT: http://localhost:19000
+      S3_REGION: us-east-1
+      S3_BUCKET: streamtube-phase03-test
+      S3_ACCESS_KEY_ID: streamtube-phase03-test
+      S3_SECRET_ACCESS_KEY: streamtube-phase03-test-secret
+      S3_FORCE_PATH_STYLE: "true"
+      S3_ALLOWED_ORIGINS: http://localhost:3000
+      REDIS_HOST: redis-test
+      REDIS_PORT: "6379"
+      VIDEO_QUEUE_PREFIX: streamtube_phase03_test
+      VIDEO_URL_TTL_SECONDS: "2"
+    depends_on:
+      dependencies-test:
+        condition: service_completed_successfully
+      db-test:
+        condition: service_healthy
+      mailpit-test:
+        condition: service_started
+      redis-test:
+        condition: service_healthy
+      storage-init-test:
+        condition: service_completed_successfully
+      migrations-test:
+        condition: service_completed_successfully
+
+  migrations-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: ["npm", "run", "migration:run"]
+    working_dir: /home/node/app
+    volumes:
+      - .:/home/node/app
+      - test-node-modules:/home/node/app/node_modules
+    environment: *test-app-environment
+    depends_on:
+      dependencies-test:
+        condition: service_completed_successfully
+      db-test:
+        condition: service_healthy
+    restart: "no"
+
+  video-worker-test:
+    profiles: [worker]
+    build:
+      context: .
+      dockerfile: Dockerfile.video-worker
+    environment:
+      <<: *test-app-environment
+      VIDEO_WORK_DIR: /work/videos
+      VIDEO_TEST_HOLD_AFTER_CLAIM_MS: ${VIDEO_TEST_HOLD_AFTER_CLAIM_MS:-0}
+      VIDEO_QUEUE_PREFIX: ${VIDEO_TEST_QUEUE_PREFIX:-streamtube_phase03_test}
+    volumes:
+      - test-worker-scratch:/work/videos
+    healthcheck:
+      test: ["CMD", "node", "-e", "const fs=require('fs');const p='/tmp/video-worker-ready';const s=fs.statSync(p);process.exit(Date.now()-s.mtimeMs<30000?0:1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      storage-init-test:
+        condition: service_completed_successfully
+      migrations-test:
+        condition: service_completed_successfully
+
+  db-test:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: streamtube_phase03_admin
+      POSTGRES_PASSWORD: streamtube_phase03_admin
+      POSTGRES_DB: streamtube_phase03_test
+      TEST_APP_DB_USER: streamtube_phase03_test
+      TEST_APP_DB_PASSWORD: streamtube_phase03_test
+    volumes:
+      - ./test/support/init-test-database.sh:/docker-entrypoint-initdb.d/10-init-test-database.sh:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U streamtube_phase03_admin -d streamtube_phase03_test",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  mailpit-test:
+    image: axllent/mailpit:v1.27.7
+
+  redis-test:
+    image: redis:7.4.7-bookworm@sha256:976ab0f0939b78c06d802bcd3bea44c5142ea9a756a57b861e08819817f768c8
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    tmpfs:
+      - /data
+
+  minio-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    image: streamtube/minio:RELEASE.2025-10-15T17-29-55Z
+    environment:
+      MINIO_ROOT_USER: streamtube-phase03-test
+      MINIO_ROOT_PASSWORD: streamtube-phase03-test-secret
+      MINIO_API_CORS_ALLOW_ORIGIN: http://localhost:3000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    tmpfs:
+      - /data:uid=1000,gid=1000,mode=0770
+
+  storage-init-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: ["npm", "run", "storage:init"]
+    working_dir: /home/node/app
+    volumes:
+      - .:/home/node/app
+      - test-node-modules:/home/node/app/node_modules
+    environment:
+      S3_INTERNAL_ENDPOINT: http://minio-test:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: streamtube-phase03-test
+      S3_ACCESS_KEY_ID: streamtube-phase03-test
+      S3_SECRET_ACCESS_KEY: streamtube-phase03-test-secret
+    depends_on:
+      dependencies-test:
+        condition: service_completed_successfully
+      minio-test:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  test-node-modules:
+  test-worker-scratch:

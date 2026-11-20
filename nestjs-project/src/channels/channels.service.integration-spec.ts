@@ -89,4 +89,26 @@ describe('ChannelsService (integration)', () => {
       expect(channels).toHaveLength(2);
     });
   });
+
+  describe('findByUserId', () => {
+    it('uses the supplied transaction manager and returns the owned channel', async () => {
+      const user = await createUser();
+      const created = await channelsService.createChannel(
+        user.id,
+        'owner@example.com',
+      );
+
+      const found = await dataSource.transaction((manager) =>
+        channelsService.findByUserId(user.id, manager),
+      );
+
+      expect(found?.id).toBe(created.id);
+    });
+
+    it('returns null when the user has no channel', async () => {
+      const user = await createUser();
+
+      await expect(channelsService.findByUserId(user.id)).resolves.toBeNull();
+    });
+  });
 });

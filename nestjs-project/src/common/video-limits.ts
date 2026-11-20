@@ -1,0 +1,4 @@
+export const MAX_VIDEO_BYTES = 10_000_000_000;
+export const VIDEO_PART_BYTES = 67_108_864;
+export const VIDEO_UPLOAD_TTL_SECONDS = 86_400;
+export const VIDEO_URL_TTL_MAX_SECONDS = 900;

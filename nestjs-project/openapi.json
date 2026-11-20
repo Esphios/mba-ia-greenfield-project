@@ -438,6 +438,652 @@
           "auth"
         ]
       }
+    },
+    "/videos": {
+      "post": {
+        "operationId": "VideosController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVideoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Idempotent replay",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVideoResponseDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Upload draft created",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVideoResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "403": {
+            "description": "CHANNEL_REQUIRED"
+          },
+          "409": {
+            "description": "IDEMPOTENCY_CONFLICT"
+          },
+          "413": {
+            "description": "VIDEO_TOO_LARGE/BODY_TOO_LARGE"
+          },
+          "415": {
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "429": {
+            "description": "UPLOAD_QUOTA_EXCEEDED"
+          },
+          "503": {
+            "description": "Storage or identifier unavailable"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Create an idempotent video upload draft",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/videos/{publicId}/upload/parts": {
+      "post": {
+        "operationId": "VideosController_signParts",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignPartsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignPartsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "UPLOAD_STATE_CONFLICT"
+          },
+          "410": {
+            "description": "UPLOAD_EXPIRED"
+          },
+          "503": {
+            "description": "STORAGE_UNAVAILABLE"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/videos/{publicId}/upload": {
+      "get": {
+        "operationId": "VideosController_uploadState",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoUploadStateDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "503": {
+            "description": "STORAGE_UNAVAILABLE"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "videos"
+        ]
+      },
+      "delete": {
+        "operationId": "VideosController_abort",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Upload aborted or already terminal"
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "UPLOAD_STATE_CONFLICT"
+          },
+          "503": {
+            "description": "STORAGE_UNAVAILABLE"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/videos/{publicId}/upload/completion": {
+      "post": {
+        "operationId": "VideosController_complete",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompleteUploadResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR/UPLOAD_INCOMPLETE"
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "UPLOAD_STATE_CONFLICT",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "UPLOAD_EXPIRED"
+          },
+          "422": {
+            "description": "UPLOAD_SIZE_MISMATCH"
+          },
+          "503": {
+            "description": "STORAGE_UNAVAILABLE"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/videos/{publicId}": {
+      "get": {
+        "operationId": "VideosController_getVideo",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoViewDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get the canonical owner-only video view",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/videos/{publicId}/stream": {
+      "head": {
+        "operationId": "VideosController_headStream",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Temporary private MP4 URL",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "VIDEO_NOT_READY"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "videos"
+        ]
+      },
+      "get": {
+        "operationId": "VideosController_stream",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Temporary private MP4 URL; Range handled by storage",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "VIDEO_NOT_READY"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Redirect owner to a temporary stream URL",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/videos/{publicId}/download": {
+      "head": {
+        "operationId": "VideosController_headDownload",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Temporary private download URL",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "VIDEO_NOT_READY"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "videos"
+        ]
+      },
+      "get": {
+        "operationId": "VideosController_download",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Private original with attachment disposition",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "VIDEO_NOT_READY"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Redirect owner to a temporary original download URL",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/videos/{publicId}/thumbnail": {
+      "head": {
+        "operationId": "VideosController_headThumbnail",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Temporary private thumbnail URL",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "VIDEO_NOT_READY"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "tags": [
+          "videos"
+        ]
+      },
+      "get": {
+        "operationId": "VideosController_thumbnail",
+        "parameters": [
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Private JPEG thumbnail",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VIDEO_NOT_FOUND"
+          },
+          "409": {
+            "description": "VIDEO_NOT_READY"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Redirect owner to a temporary JPEG thumbnail URL",
+        "tags": [
+          "videos"
+        ]
+      }
     }
   },
   "info": {
@@ -480,6 +1126,256 @@
       "ResetPasswordDto": {
         "type": "object",
         "properties": {}
+      },
+      "CreateVideoDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "filename": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "sizeBytes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10000000000
+          },
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "video/mp4"
+            ]
+          }
+        },
+        "required": [
+          "title",
+          "filename",
+          "sizeBytes",
+          "contentType"
+        ]
+      },
+      "VideoViewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "publicId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "processing",
+              "ready",
+              "error"
+            ]
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "durationMs": {
+            "type": "object",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "nullable": true
+          },
+          "failureCode": {
+            "type": "object",
+            "nullable": true
+          },
+          "canonicalUrl": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "publicId",
+          "title",
+          "status",
+          "sizeBytes",
+          "durationMs",
+          "metadata",
+          "failureCode",
+          "canonicalUrl",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UploadedPartDto": {
+        "type": "object",
+        "properties": {
+          "partNumber": {
+            "type": "number"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "etag": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "partNumber",
+          "sizeBytes",
+          "etag"
+        ]
+      },
+      "VideoUploadStateDto": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "initiating",
+              "uploading",
+              "completing",
+              "completed",
+              "aborted",
+              "expired"
+            ]
+          },
+          "partSize": {
+            "type": "number"
+          },
+          "partCount": {
+            "type": "number"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastErrorCode": {
+            "type": "object",
+            "nullable": true
+          },
+          "uploadedParts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UploadedPartDto"
+            }
+          }
+        },
+        "required": [
+          "state",
+          "partSize",
+          "partCount",
+          "expiresAt",
+          "lastErrorCode",
+          "uploadedParts"
+        ]
+      },
+      "CreateVideoResponseDto": {
+        "type": "object",
+        "properties": {
+          "video": {
+            "$ref": "#/components/schemas/VideoViewDto"
+          },
+          "upload": {
+            "$ref": "#/components/schemas/VideoUploadStateDto"
+          }
+        },
+        "required": [
+          "video",
+          "upload"
+        ]
+      },
+      "SignPartsDto": {
+        "type": "object",
+        "properties": {
+          "partNumbers": {
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "partNumbers"
+        ]
+      },
+      "SignedPartDto": {
+        "type": "object",
+        "properties": {
+          "partNumber": {
+            "type": "number"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "expectedSizeBytes": {
+            "type": "number"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "partNumber",
+          "url",
+          "expectedSizeBytes",
+          "expiresAt"
+        ]
+      },
+      "SignPartsResponseDto": {
+        "type": "object",
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SignedPartDto"
+            }
+          }
+        },
+        "required": [
+          "parts"
+        ]
+      },
+      "CompleteUploadDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CompleteUploadResponseDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "processing",
+              "ready",
+              "error"
+            ]
+          }
+        },
+        "required": [
+          "publicId",
+          "status"
+        ]
       },
       "ApiErrorEnvelope": {
         "type": "object",

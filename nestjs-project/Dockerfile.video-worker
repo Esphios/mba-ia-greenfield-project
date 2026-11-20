@@ -1,0 +1,23 @@
+FROM node:25.6.0-slim@sha256:3746b7c78e343062cbad1a1a9f22e582e2aaeda5b183b7050b5831e22f988730
+
+ARG FFMPEG_VERSION=7:5.1.9-0+deb12u1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends "ffmpeg=${FFMPEG_VERSION}" ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && ffmpeg -version \
+    && ffprobe -version
+
+WORKDIR /home/node/app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+RUN mkdir -p /work/videos && chown -R node:node /work/videos
+
+USER node
+
+CMD ["node", "dist/video-worker"]
