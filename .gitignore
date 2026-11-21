@@ -1,5 +1,8 @@
 .history/
 settings.local.json
+.mcp.json
+_claude-sessions/
+**/.large-*
 docs/desafio/
 openspec/
 # Gerado por scripts/sync-codex-foundation.ps1; a fonte pública é docs/ai/codex/.
