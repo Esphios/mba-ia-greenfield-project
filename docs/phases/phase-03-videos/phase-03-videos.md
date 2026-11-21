@@ -3,8 +3,8 @@ kind: phase
 name: phase-03-videos
 ui_in_scope: false
 test_specs_aware: true
-review_status: audit-2026-11-18-local-candidate-certified
-implementation_status: local-certified-publication-pending
+review_status: audit-2026-11-18-published
+implementation_status: complete-published
 sources_mtime:
   docs/project-plan.md: "2026-11-06T21:14:04.524112+00:00"
   docs/decisions/technical-decisions-phase-03-videos.md: "2026-11-07T14:51:09.062534+00:00"
@@ -698,7 +698,7 @@ certificam o candidato reaberto pela auditoria de 18/11.
 - **Tests:** gates afetados, manifesto integrado e inspeção do fork público.
 - **Acceptance:** sem commit em `main`, SHA/URL verificados e nenhum material privado.
 - **Dependencies:** SI-03.36 com candidato aprovado; autorização separada para commit e para push.
-- **Status:** commits e reconciliação local concluídos após autorização; publicação remota bloqueada até autorização distinta.
+- **Status:** concluída em 20/11/2026; feature e `dev` publicadas no fork, SHA/URL e conteúdo público verificados, sem alteração em `main`.
 
 ## Technical Specifications
 
@@ -1247,7 +1247,7 @@ nunca recebe checkbox concluído por existir script ou teste com tamanho mockado
 - [x] SI-03.34 — Executar regressões e gates funcionais
 - [x] SI-03.35 — Repetir ensaios grandes
 - [x] SI-03.36 — Certificar candidato imutável
-- [ ] SI-03.37 — Preparar/publicar via Git Flow após autorizações
+- [x] SI-03.37 — Preparar/publicar via Git Flow após autorizações
 
 Executar em `nestjs-project/`, no candidato final:
 
@@ -1293,9 +1293,9 @@ docker compose -f compose.test.yaml --profile worker exec -T nestjs-api-test npm
 | Qualidade/segurança/docs | N05–N11 | SI-03.31, SI-03.33, SI-03.36 | testes por comportamento, logs/policy, fonte pública e perfil de mídia |
 
 SI-03.1–15 formam a base; SI-03.16–27 e suas evidências permanecem históricos.
-Uma caixa histórica não prova esta remediação. A fase recuperou o aceite local
-após SI-03.28–36 e DoD runtime; a publicação de SI-03.37 exige autorização e
-verificação separadas.
+Uma caixa histórica não prova esta remediação. A fase recuperou o aceite após
+SI-03.28–36 e DoD runtime; SI-03.37 recebeu autorizações separadas e concluiu a
+publicação e verificação no fork.
 
 | ID | Exigência | Dono / evidência futura |
 | --- | --- | --- |

@@ -119,5 +119,11 @@ Após os commits, a primeira repetição passou 316 testes padrão, 92 e2e, 14
 integrações FFmpeg, 2 e2e de worker, TypeScript e lint. A repetição final ocorreu
 entre os manifests determinísticos before/after adjacentes, que registram a
 mesma árvore byte a byte. A varredura de segredos não encontrou material
-privado no candidato. Push e publicação não estão autorizados pela tarefa 9.2 e
-permanecem pendentes da autorização distinta da tarefa 9.3.
+privado no candidato.
+
+Em 20/11/2026, a autorização distinta da tarefa 9.3 publicou atomicamente
+`dev` e `feature/phase-03-videos` no fork na revisão certificada `a967f9e`. A
+API pública do GitHub e os arquivos raw confirmaram código, OpenAPI, tipos,
+documentos e evidências com os blobs locais; `main` permaneceu em `8459b2f` e a
+árvore remota não contém configuração pessoal, transcripts, OpenSpec, enunciado
+privado ou outputs `.large-*`.

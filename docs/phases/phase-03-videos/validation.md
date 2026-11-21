@@ -3,7 +3,7 @@ kind: phase
 name: phase-03-videos
 status: clean
 issue_count: 0
-review_status: audit-2026-11-18-local-candidate-certified
+review_status: audit-2026-11-18-published
 sources_mtime:
   docs/phases/phase-03-videos/context.md: "2026-11-18T05:13:18.9605951Z"
   docs/decisions/technical-decisions-phase-03-videos.md: "2026-11-17T23:44:23.9433401Z"
@@ -268,7 +268,7 @@ datadas antigas.
 | A14 | ensaios no perfil padrão e JWT natural | SI-03.22 | atendido |
 | A15 | persistência encapsulada em repositórios tipados | SI-03.16 | atendido |
 | A16 | DB_HOST obrigatório e role restrita confirmada | SI-03.16 | atendido |
-| A17 | preparação pública; publicação somente autorizada | SI-03.22 | preparação atendida; publicação pendente externa |
+| A17 | preparação pública; publicação somente autorizada | SI-03.22/37 | publicação autorizada, executada e verificada no fork |
 | N01 | TTL fixo de sessão e URL no máximo 900s | SI-03.19 | atendido |
 | N02 | canonicalUrl absoluta por API_PUBLIC_URL | SI-03.19 | atendido |
 | N03 | lib-storage explícito 64MiB/2 e decisão BullMQ | SI-03.18, SI-03.21 | atendido |
@@ -299,18 +299,19 @@ commit, integração ou publicação.
 - SI-03.28–36: trabalho corrente concluído com regressões, gates, dois ensaios
   grandes e certificação sobre a mesma árvore congelada; os artefatos públicos
   preservam tentativas reprovadas/interrompidas e os resultados aprovados.
-- SI-03.37 recebeu autorização para commit e reconciliação local; a publicação
-  remota continua dependente de autorização distinta.
+- SI-03.37 recebeu as autorizações distintas para commit/reconciliação e
+  publicação; `dev` e a feature foram verificadas no fork público sem alterar
+  `main`.
 
-| Requisitos | Unidades correntes | Evidência pública observada / pendência |
+| Requisitos | Unidades correntes | Evidência pública observada |
 | --- | --- | --- |
-| F01–F04 | SI-03.28, SI-03.34, SI-03.36–37 | [stack e certificação local](evidence/remediation-2026-11-18.md); manifests e gates congelados concluídos, publicação remota pendente |
+| F01–F04 | SI-03.28, SI-03.34, SI-03.36–37 | [stack, certificação e publicação](evidence/remediation-2026-11-18.md); manifests/gates concluídos e revisão pública verificada |
 | F05–F06 | SI-03.29 | [52 testes dirigidos + 3 e2e](evidence/remediation-2026-11-18.md) em PostgreSQL/MinIO reais |
 | F07–F09 | SI-03.30 | [matriz corrente](evidence/failpoint-matrix.md) de corrida, relógio DB, CAS e TTL |
 | F10–F11 | SI-03.31 | [regressões F08–F12](evidence/remediation-2026-11-18.md), documento OpenAPI e tipos regenerados |
 | F12 | SI-03.32 | [deadline/cancelamento](evidence/remediation-2026-11-18.md) e recovery de resultado ambíguo |
 | N01–N04/N12 | SI-03.33–35 | [dois ensaios correntes](evidence/large-trials.md) medidos por atividade e operação portátil |
-| N05–N11 | SI-03.31, SI-03.33, SI-03.36 | [policy/logs/Compose e candidato local](evidence/remediation-2026-11-18.md) e [mídia representativa](evidence/large-trials.md); publicação pública ainda pendente |
+| N05–N11 | SI-03.31, SI-03.33, SI-03.36 | [policy/logs/Compose e candidato publicado](evidence/remediation-2026-11-18.md) e [mídia representativa](evidence/large-trials.md); revisão pública conferida |
 
 Validação estrutural de 18/11: títulos SI-03.16–27 coincidem entre plano e
 progresso; SI-03.28–37 têm identidade única; o mapa termina em SI-03.36 antes de

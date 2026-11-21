@@ -12,8 +12,8 @@ a largura estiver dentro de 3840.
 
 Na remediação corrente, regressões, gates e os ensaios de fronteira e mídia
 representativa passaram. A DoD foi repetida sobre o candidato integrado e
-congelado; somente a publicação remota permanece separada. Consulte
-`progress.md` para o estado de entrega.
+congelado, depois publicado e verificado no fork. Consulte `progress.md` para o
+estado de entrega.
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>

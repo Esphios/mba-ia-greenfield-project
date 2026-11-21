@@ -86,9 +86,8 @@ ensaio se qualquer requisito estiver abaixo do mínimo ou se a arquitetura das
 imagens não estiver disponível. Consulte
 [`progress.md`](progress.md) antes de declarar a fase concluída: os dois ensaios
 correntes comprovaram conteúdo, delivery, recursos e limites de latência com
-probe independente. Os failpoints e a DoD repetida sobre o candidato integrado
-estão registrados ali; somente a publicação remota via Git Flow permanece como
-etapa posterior.
+probe independente. Os failpoints, a DoD repetida e a publicação verificada do
+candidato integrado estão registrados ali.
 
 O harness separa baseline, PUT ativo, pausa natural do JWT, retomada,
 processamento e delivery. A pausa é registrada, mas não é somada a latência de

@@ -2,7 +2,7 @@
 kind: phase
 name: phase-03-videos
 ui_in_scope: false
-review_status: audit-2026-11-18-local-candidate-certified
+review_status: audit-2026-11-18-published
 sources_mtime:
   docs/project-plan.md: "2026-11-06T21:14:04.524112+00:00"
   docs/decisions/technical-decisions-phase-03-videos.md: "2026-11-17T23:44:23.9433401Z"
@@ -364,16 +364,16 @@ a DoD runtime ainda depende dos gates finais sobre manifesto estável.
 
 O estado corrente substitui apenas a interpretação de aceite, sem apagar o
 histórico. SI-03.1–15 são a base, SI-03.16–27 registram trabalho observado em
-17/11, SI-03.28–36 estão concluídas e SI-03.37 foi integrada localmente, com a
-publicação condicionada a autorização posterior. A auditoria F01–F12/N01–N12
+17/11 e SI-03.28–37 estão concluídas, inclusive integração e publicação
+verificada no fork. A auditoria F01–F12/N01–N12
 reabriu cleanup/quota, fencing multipart, relógio/CAS/TTL, JSON/OpenAPI, deadlines
 S3, readiness/portabilidade/policy/logs, perfil de mídia, ensaios e certificação.
 
 A execução autorizada usa `compose.test.yaml` standalone e comandos
 no container. `clean` continua significando somente coerência do planejamento;
 não significa aprovação, implementação, teste, ensaio, DoD, commit ou publicação.
-SI-03.37 recebeu autorização para commits e reconciliação local após o candidato
-aprovado de SI-03.36; push e verificação pública mantêm autorização distinta.
+SI-03.37 recebeu as autorizações separadas para commits/reconciliação e para
+push/verificação pública; `main` permaneceu intocada.
 
 ## Inherited Decisions Detail
 

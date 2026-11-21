@@ -35,7 +35,7 @@ FFmpeg e 2 e2e de worker. Os dois ensaios grandes correntes chegaram a `ready` e
 publicaram recursos, disco e event loop. Evidências estão em
 `docs/phases/phase-03-videos/evidence/remediation-2026-11-18.md` e
 `docs/phases/phase-03-videos/evidence/large-trials.md`; a certificação local do
-candidato integrado e congelado repetiu os mesmos gates, com publicação pendente.
+candidato integrado e congelado repetiu os mesmos gates e foi publicado no fork.
 
 ## Test Scenarios
 

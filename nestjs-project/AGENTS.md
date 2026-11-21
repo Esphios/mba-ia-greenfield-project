@@ -74,7 +74,7 @@ worker FFmpeg e delivery privado. SI-03.1–27 preservam o histórico e
 SI-03.28–37 registram a remediação corrente em
 `docs/phases/phase-03-videos/progress.md`. O candidato integrado certificado
 localmente executou 316 testes padrão, 92 e2e, 14 integrações FFmpeg e 2 e2e de
-worker; somente a publicação remota continua sendo um gate separado.
+worker; a mesma revisão foi publicada e verificada no fork.
 Os dois ensaios grandes correntes com probe independente cumpriram os critérios
 de conteúdo, delivery, recursos e latência; use apenas a seção corrente de
 evidências para aceitar a remediação. Preserve os registros datados em

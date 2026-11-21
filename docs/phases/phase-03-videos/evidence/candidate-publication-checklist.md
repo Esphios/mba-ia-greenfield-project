@@ -1,29 +1,25 @@
 # Candidato público — Fase 03
 
-Data da revisão local/remota: 20/11/2026. A autorização da tarefa 9.2 cobriu os
-commits e a reconciliação local descritos aqui; este documento não autoriza push.
+Data da revisão local/remota: 20/11/2026. Autorizações distintas cobriram os
+commits/reconciliação da tarefa 9.2 e a publicação/verificação da tarefa 9.3.
 
 ## Estado remoto verificado
 
-- branch local: `feature/phase-03-videos`; `upstream/dev` foi atualizado para
-  `0b82246ff8fa9937f556c52ea6bb15357309d289` e é ancestral da feature, portanto
-  nenhuma rebase ou merge foi necessária;
-- commits focados locais: `2f467af` (fundação Codex), `ff42437` (pipeline da
-  Fase 03) e `cbc401b` (documentação/evidências); `main` não foi alterada;
+- revisão certificada: `a967f9ed28adb4186a29d10744c2be0975bd8491` na branch
+  `feature/phase-03-videos`; `upstream/dev=0b82246f…` é ancestral e nenhuma
+  rebase ou merge foi necessária;
+- commits focados: `2f467af` (fundação Codex), `ff42437` (pipeline), `cbc401b`
+  (documentação/evidências), `3d17c2e` (certificação integrada) e `a967f9e`
+  (exclusão de artefatos locais); `main` não foi alterada;
 - `origin`: `Esphios/mba-ia-greenfield-project`, repositório público e fork de
   `devfullcycle/mba-ia-greenfield-project`;
-- `git ls-remote --heads origin main dev`, executado em 20/11, leu somente
-  `main=8459b2f3a9c0dcad4bd0f31972761c00c52609a1`; o servidor não retornou
-  `origin/dev`;
-- a única tracking ref local confirmada é `origin/main=8459b2f…`; não existe
-  `refs/remotes/origin/dev`, portanto o texto não trata o resultado de
-  `ls-remote` como ref local nem afirma que houve fetch;
-- `git ls-remote --heads upstream main dev` leu
-  `main=8459b2f3a9c0dcad4bd0f31972761c00c52609a1` e
-  `dev=0b82246ff8fa9937f556c52ea6bb15357309d289`. As URLs HTTPS dos dois remotos
-  responderam sem credencial, evidenciando acesso público de leitura; `origin`
-  permanece o fork configurado do projeto upstream. A divergência remota deve
-  ser resolvida explicitamente, sem inventar uma tracking ref `origin/dev`.
+- push atômico criou `origin/dev` e `origin/feature/phase-03-videos` em
+  `a967f9ed28adb4186a29d10744c2be0975bd8491`; `origin/main` permaneceu em
+  `8459b2f3a9c0dcad4bd0f31972761c00c52609a1`;
+- a API pública do GitHub confirmou `private=false`, `fork=true` e parent
+  `devfullcycle/mba-ia-greenfield-project`. A árvore da revisão e os arquivos
+  raw de código, OpenAPI, tipos, progresso e manifesto responderam sem credencial
+  e com os mesmos blobs locais.
 
 ## Conteúdo público do candidato
 
@@ -31,7 +27,9 @@ A lista determinística pública, que inclui arquivos tracked inalterados
 necessários à revisão, contém 966 caminhos: 268 em `.claude`, 1 em `.codex`, 388
 em `docs`, 197 no backend, 98 no frontend, 3 em `scripts` e 11 na raiz. A revisão
 por categoria e o histórico Git cobrem o delta; o manifesto SHA-256 cobre a
-árvore pública completa. O volume de fixtures grandes não está na árvore Git.
+árvore pública completa. O par before/after tem SHA-256
+`6e825bd85b4402d373fb2e4571170a1622b3467fe6b97d21611f5fc1bb46474c` e
+certifica a revisão `a967f9e`. O volume de fixtures grandes não está na árvore Git.
 
 - backend NestJS: configuração, migrations, storage, vídeos, worker, testes,
   fixtures pequenas e scripts de ensaio;
@@ -55,7 +53,7 @@ querystring assinada.
 
 ## Checklist de integração feature → dev
 
-1. Três commits focados foram criados na feature após revisão de status, arquivos
+1. Commits focados foram criados na feature após revisão de status, arquivos
    novos, whitespace e segredos; OpenSpec/enunciado permaneceram excluídos.
 2. `git fetch upstream dev` atualizou a base, e a verificação de ancestralidade
    confirmou que a feature já continha `upstream/dev`; `main` ficou intocada.
@@ -63,9 +61,9 @@ querystring assinada.
    integrações FFmpeg, 2 e2e de worker, tsc e lint.
 4. Os manifests `candidate-before.sha256` e `candidate-after.sha256` adjacentes
    são a prova autoritativa de identidade da árvore na repetição final dos gates.
-5. Somente com a autorização distinta da tarefa 9.3, fazer push das branches
-   autorizadas — inclusive criar `origin/dev`, se esse for o destino aprovado —,
-   abrir/revisar a comparação remota e confirmar que código, docs,
-   OpenAPI/tipos e evidências públicas estão visíveis no fork.
-6. Registrar URL e revisão publicada. Sem autorização, manter a tarefa 9.3
-   aberta e não arquivar a change como entrega integral.
+5. Após autorização distinta da tarefa 9.3, o push atômico criou `origin/dev` e
+   `origin/feature/phase-03-videos`; ambos foram verificados na revisão certificada.
+6. Revisão publicada: [`a967f9ed28adb4186a29d10744c2be0975bd8491`](https://github.com/Esphios/mba-ia-greenfield-project/commit/a967f9ed28adb4186a29d10744c2be0975bd8491).
+   Código, documentos, OpenAPI/tipos e evidências foram lidos publicamente; a
+   árvore remota contém zero `.mcp.json`, `_claude-sessions/`, `openspec/`,
+   `docs/desafio/` ou `.large-*`.

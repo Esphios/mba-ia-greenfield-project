@@ -13,9 +13,9 @@ autenticação. A Fase 03 implementa no backend persistência de vídeos, storag
 S3/MinIO, fila/outbox, controle HTTP de upload, worker FFmpeg e delivery
 privado. Os dois ensaios grandes da remediação corrente cumpriram os critérios
 de conteúdo, delivery, recursos e desempenho com probe independente; o
-candidato integrado foi certificado localmente e somente a publicação remota
-permanece pendente em `docs/phases/phase-03-videos/progress.md`. A interface de
-vídeos está fora dessa fase.
+candidato integrado foi certificado e publicado no fork via `dev` e
+`feature/phase-03-videos`, conforme `docs/phases/phase-03-videos/progress.md`.
+A interface de vídeos está fora dessa fase.
 Uma solicitação de proposta autoriza apenas documentação e planejamento;
 aguarde a revisão do usuário antes de implementar.
 

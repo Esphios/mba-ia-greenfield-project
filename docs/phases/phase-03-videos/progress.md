@@ -1,8 +1,8 @@
 # phase-03-videos — Progress
 
-**Status:** local_candidate_certified_publication_pending
+**Status:** complete_published
 **SIs:** SI-03.1–15 base; SI-03.16–27 históricos; SI-03.28–37 remediação atual
-**Implementation:** SI-03.28–36 concluídos; SI-03.37 integrada localmente, publicação pendente
+**Implementation:** SI-03.28–37 concluídos; candidato certificado e publicado no fork
 
 ## Baseline da auditoria de requisitos — 2026-11-18
 
@@ -63,10 +63,11 @@
 - **SI-03.36:** candidato integrado certificado localmente. Secret scan e
   manifests determinísticos before/after cobrem a mesma árvore; passaram 316
   testes padrão, 92 e2e, 14 integrações FFmpeg, 2 e2e de worker, tsc e lint.
-- **SI-03.37:** a autorização da tarefa 9.2 permitiu três commits focados e a
-  reconciliação com `upstream/dev`, já ancestral da feature. `main` permaneceu
-  intocada. Push e publicação continuam proibidos até a autorização distinta da
-  tarefa 9.3.
+- **SI-03.37:** autorizações distintas cobriram commits/reconciliação e
+  publicação. O candidato certificado `a967f9ed28adb4186a29d10744c2be0975bd8491`
+  foi publicado atomicamente em `dev` e `feature/phase-03-videos` no fork; código,
+  OpenAPI, tipos, documentos e evidências responderam publicamente com os blobs
+  locais. `main` permaneceu em `8459b2f3a9c0dcad4bd0f31972761c00c52609a1`.
 
 ## Snapshot histórico — remediação da auditoria de 2026-11-16
 
